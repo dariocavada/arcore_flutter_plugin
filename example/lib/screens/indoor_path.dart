@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:vector_math/vector_math_64.dart' as vector;
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 
 class IndoorPath extends StatefulWidget {
@@ -16,7 +17,7 @@ class _IndoorIndoorPath extends State<IndoorPath> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('AugmentedPage'),
+          title: const Text('Indoor Path'),
         ),
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,
@@ -31,14 +32,15 @@ class _IndoorIndoorPath extends State<IndoorPath> {
   void _onArCoreViewCreated(ArCoreController controller) async {
     arCoreController = controller;
     arCoreController.onTrackingImage = _handleOnTrackingImage;
-    //loadSingleImage();
+    loadSingleImage();
     //OR
-    loadImagesDatabase();
+    //loadImagesDatabase();
   }
 
   loadSingleImage() async {
-    final ByteData bytes =
-        await rootBundle.load('assets/earth_augmented_image.jpg');
+    /*final ByteData bytes =
+        await rootBundle.load('assets/earth_augmented_image.jpg');*/
+    final ByteData bytes = await rootBundle.load('assets/marker-02.png');
     arCoreController.loadSingleAugmentedImage(
         bytes: bytes.buffer.asUint8List());
   }
@@ -52,42 +54,59 @@ class _IndoorIndoorPath extends State<IndoorPath> {
   _handleOnTrackingImage(ArCoreAugmentedImage augmentedImage) {
     if (!augmentedImagesMap.containsKey(augmentedImage.index)) {
       augmentedImagesMap[augmentedImage.index] = augmentedImage;
-      _addSphere(augmentedImage);
+      _addPath(augmentedImage);
     }
-  }
-
-  Future _addSphere(ArCoreAugmentedImage augmentedImage) async {
-    final ByteData textureBytes = await rootBundle.load('assets/earth.jpg');
-
-    final material = ArCoreMaterial(
-      color: Color.fromARGB(120, 66, 134, 244),
-      textureBytes: textureBytes.buffer.asUint8List(),
-    );
-    final sphere = ArCoreSphere(
-      materials: [material],
-      radius: augmentedImage.extentX / 2,
-    );
-    final node = ArCoreNode(
-      shape: sphere,
-    );
-    arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
   }
 
   Future _addPath(ArCoreAugmentedImage augmentedImage) async {
 
+    print(
+        "_addPath ${augmentedImage.centerPose.translation.toString()} ${augmentedImage.centerPose.rotation.toString()}");
+
+    // Debug Spheres
+    _addCubeToPos(augmentedImage, vector.Vector3(0, 0, 0), Color.fromARGB(255, 255, 255, 255)); // Gray Centers
+    _addSphereToPos(augmentedImage, vector.Vector3(.1, 0, 0), Color.fromARGB(255, 255, 0, 0)); // R (X) <-
+    _addSphereToPos(augmentedImage, vector.Vector3(0, .1, 0), Color.fromARGB(255, 0, 255, 0)); // G (Y) versus me
+    _addSphereToPos(augmentedImage, vector.Vector3(0, 0, .1), Color.fromARGB(255, 0, 0, 255)); // B (Z) ^
+
+    for (double i=0;i<2;i=i+0.1) {
+      final x = i*-1;
+      _addSphereToPos(augmentedImage, vector.Vector3(x, 0, -.5), Color.fromARGB(255, 0, 255, 0)); // G
+    }
+
+  }
+
+  Future _addSphereToPos(augmentedImage, vector.Vector3 v3, Color color) async {
+
     final material = ArCoreMaterial(
-      color: Color.fromARGB(255, 254, 100, 100),
+      color: color
     );
     final sphere = ArCoreSphere(
       materials: [material],
       radius: augmentedImage.extentX / 10,
     );
-
     final node = ArCoreNode(
       shape: sphere,
-      position: augmentedImage.centerPose.translation,
+      position: v3,
+    );
+    arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
+  }
+
+  Future _addCubeToPos(augmentedImage, vector.Vector3 v3, Color color) async {
+
+    final material = ArCoreMaterial(
+      color: color
     );
 
+    final s = augmentedImage.extentX / 10;
+    final cube = ArCoreCube(
+      materials: [material],
+      size: vector.Vector3(s,s,s),
+    );
+    final node = ArCoreNode(
+      shape: cube,
+      position: v3,
+    );
     arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
   }
 
