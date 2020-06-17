@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 
-class AugmentedPage extends StatefulWidget {
+class IndoorPath extends StatefulWidget {
   @override
-  _AugmentedPageState createState() => _AugmentedPageState();
+  _IndoorIndoorPath createState() => _IndoorIndoorPath();
 }
 
-class _AugmentedPageState extends State<AugmentedPage> {
+class _IndoorIndoorPath extends State<IndoorPath> {
   ArCoreController arCoreController;
   Map<int, ArCoreAugmentedImage> augmentedImagesMap = Map();
 
@@ -70,6 +70,24 @@ class _AugmentedPageState extends State<AugmentedPage> {
     final node = ArCoreNode(
       shape: sphere,
     );
+    arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
+  }
+
+  Future _addPath(ArCoreAugmentedImage augmentedImage) async {
+
+    final material = ArCoreMaterial(
+      color: Color.fromARGB(255, 254, 100, 100),
+    );
+    final sphere = ArCoreSphere(
+      materials: [material],
+      radius: augmentedImage.extentX / 10,
+    );
+
+    final node = ArCoreNode(
+      shape: sphere,
+      position: augmentedImage.centerPose.translation,
+    );
+
     arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
   }
 
