@@ -54,9 +54,9 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                     }
 
                     TrackingState.TRACKING -> {
-                        Log.i(TAG, "${augmentedImage.name} ${augmentedImage.trackingMethod}")
+                        //Log.i(TAG, "${augmentedImage.name} ${augmentedImage.trackingMethod}")
                         if (!augmentedImageMap.containsKey(augmentedImage.index)) {
-                            Log.i(TAG, "${augmentedImage.name} ASSENTE")
+                            //Log.i(TAG, "${augmentedImage.name} ASSENTE")
                             val centerPoseAnchor = augmentedImage.createAnchor(augmentedImage.centerPose)
                             val anchorNode = AnchorNode()
                             anchorNode.anchor = centerPoseAnchor

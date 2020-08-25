@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class IndoorPath extends StatefulWidget {
   @override
@@ -32,17 +33,40 @@ class _IndoorIndoorPath extends State<IndoorPath> {
   void _onArCoreViewCreated(ArCoreController controller) async {
     arCoreController = controller;
     arCoreController.onTrackingImage = _handleOnTrackingImage;
-    loadSingleImage();
+    //loadSingleImage();
     //OR
     //loadImagesDatabase();
+
+    loadRemoteImagesDatabase();
   }
 
   loadSingleImage() async {
+    String url =
+        'https://s3-eu-west-1.amazonaws.com/mkspresprod.suggesto.eu/centrotrevi/armarkers/trevilab-02-fs8.png';
+
+    var file = await DefaultCacheManager().getSingleFile(url);
+
+    //final ByteData bytes = file.readAsBytesSync();
+
     /*final ByteData bytes =
         await rootBundle.load('assets/earth_augmented_image.jpg');*/
-    final ByteData bytes = await rootBundle.load('assets/marker-02.png');
-    arCoreController.loadSingleAugmentedImage(
-        bytes: bytes.buffer.asUint8List());
+    //final ByteData bytes = await rootBundle.load('assets/marker-02.png');
+
+    //arCoreController.loadSingleAugmentedImage(
+    //    bytes: bytes.buffer.asUint8List());
+
+    arCoreController.loadSingleAugmentedImage(bytes: file.readAsBytesSync());
+  }
+
+  loadRemoteImagesDatabase() async {
+    String url =
+        'https://s3-eu-west-1.amazonaws.com/mkspresprod.suggesto.eu/centrotrevi/armarkers/trevilab.imgdb';
+
+    var file = await DefaultCacheManager().getSingleFile(url);
+
+    arCoreController.loadAugmentedImagesDatabase(
+      bytes: file.readAsBytesSync(),
+    );
   }
 
   loadImagesDatabase() async {
@@ -98,8 +122,6 @@ class _IndoorIndoorPath extends State<IndoorPath> {
       acn.add(node);
     }
 
-    
-
     /*
     var value: Float = 5.0
 
@@ -134,16 +156,11 @@ class _IndoorIndoorPath extends State<IndoorPath> {
       materials: [material],
       size: vector.Vector3(w, h, l),
     );
-    final node = ArCoreNode(
-      shape: cube,
-      position: v3,
-      rotation: v4rot,
-      children: acn
-    );
+    final node =
+        ArCoreNode(shape: cube, position: v3, rotation: v4rot, children: acn);
 
     print("ArCoreCube ${node.rotation.toString()}");
     arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
-
   }
 
   Future _addSphereToPos(augmentedImage, vector.Vector3 v3, Color color) async {
@@ -161,7 +178,8 @@ class _IndoorIndoorPath extends State<IndoorPath> {
     arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
   }
 
-  Future _addCubeToPos(ArCoreAugmentedImage augmentedImage, vector.Vector3 v3, Color color) async {
+  Future _addCubeToPos(ArCoreAugmentedImage augmentedImage, vector.Vector3 v3,
+      Color color) async {
     final material = ArCoreMaterial(color: color);
 
     /*

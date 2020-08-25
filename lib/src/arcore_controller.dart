@@ -60,7 +60,8 @@ class ArCoreController {
   }
 
   Future<dynamic> _handleMethodCalls(MethodCall call) async {
-    print('_platformCallHandler call ${call.method} ${call.arguments}');
+    // TODO - ENABLE DISABLE DEBUG MESSAGES
+    // print('_platformCallHandler call ${call.method} ${call.arguments}');
     switch (call.method) {
       case 'onError':
         if (onError != null) {
@@ -90,13 +91,15 @@ class ArCoreController {
         }
         break;
       case 'onTrackingImage':
-        print('flutter onTrackingImage');
+        // TODO - ENABLE DISABLE DEBUG MESSAGES
+        //print('flutter onTrackingImage');
         final arCoreAugmentedImage =
             ArCoreAugmentedImage.fromMap(call.arguments);
         onTrackingImage(arCoreAugmentedImage);
         break;
       default:
-        print('Unknowm method ${call.method} ');
+      // TODO - ENABLE DISABLE DEBUG MESSAGES
+      // print('Unknowm method ${call.method} ');
     }
     return Future.value();
   }
@@ -104,7 +107,8 @@ class ArCoreController {
   Future<void> addArCoreNode(ArCoreNode node, {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
-    print(params.toString());
+    // TODO - ENABLE DISABLE DEBUG MESSAGES
+    //print(params.toString());
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNode', params);
   }
@@ -122,7 +126,8 @@ class ArCoreController {
       {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
-    print(params.toString());
+    // TODO - ENABLE DISABLE DEBUG MESSAGES
+    // print(params.toString());
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNodeWithAnchor', params);
   }
