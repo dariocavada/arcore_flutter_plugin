@@ -1,3 +1,10 @@
+
+## 0.0.6+2
+
+* Update AR Core to 1.18+ 
+* Update Sceneform dependencies to 1.15+
+* Bug fixing (compilation errors)
+
 ## 0.0.5+1
 
 * Migrate to new Android Plugin Api
